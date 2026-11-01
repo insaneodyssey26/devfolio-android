@@ -17,3 +17,14 @@ captures
 !*.xcworkspace/contents.xcworkspacedata
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
+
+# Android signing keys & credentials
+*.jks
+*.keystore
+keystore.properties
+*.mobileprovision
+google-services.json
+**/release/*.apk
+**/release/*.aab
+androidApp/release/
+

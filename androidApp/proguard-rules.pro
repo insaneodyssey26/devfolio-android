@@ -1,21 +1,34 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Android R8 / ProGuard rules for Devfolio
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Kotlinx Serialization
+-keepattributes *Annotation*, InnerClasses, EnclosingMethod
+-keepclassmembers class * {
+    @kotlinx.serialization.SerialName <fields>;
+    @kotlinx.serialization.Serializable <fields>;
+}
+-keepclassmembers class *$$serializer {
+    public static final *$$serializer INSTANCE;
+}
+-keepclasseswithmembers class * {
+    kotlinx.serialization.KSerializer serializer(...);
+}
+-keep class com.masum.devfolio.model.** { *; }
+-keep class com.masum.devfolio.data.model.** { *; }
+-keep class com.masum.devfolio.data.hackathon.** { *; }
+-keep class com.masum.devfolio.data.auth.** { *; }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Ktor & OkHttp
+-dontwarn io.ktor.**
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class io.ktor.** { *; }
+-keep class okhttp3.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Kotlin Coroutines
+-dontwarn kotlinx.coroutines.**
+-keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
+-keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
+
+# Compose & Coil
+-dontwarn coil3.**
+-keep class coil3.** { *; }
