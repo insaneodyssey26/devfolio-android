@@ -464,7 +464,7 @@ fun SettingsScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = "Version 0.1.0-alpha · Project credits and repository",
+                                    text = "Version ${com.masum.devfolio.BuildConfig.VERSION_NAME} · Project credits and repository",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

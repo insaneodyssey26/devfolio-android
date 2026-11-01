@@ -39,7 +39,7 @@ body:
       placeholder: |
         - Device: [e.g. Pixel 8, Galaxy S23]
         - Android Version: [e.g. Android 14 / API 34]
-        - App Version: [e.g. 0.1.0-alpha]
+        - App Version: [e.g. 0.1.1-alpha]
     validations:
       required: true
   - type: textarea

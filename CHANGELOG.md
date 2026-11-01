@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.1-alpha] - 2026-11-02
+
+### Added
+- **Session Cookie Inspector**:
+  - Restored full Devfolio session cookies viewer (`rawCookies`) alongside the session access token on the Portfolio screen with show/hide masking and one-tap clipboard copy.
+- **Direct Portfolio Account Integration**:
+  - Automatically identifies active Devfolio web session on the unlinked hero screen and offers a 1-tap "Sync @username's Portfolio" button.
+- **Hardware-Backed Encrypted Storage**:
+  - Integrated `androidx.security:security-crypto:1.1.0` with Android Keystore AES256-GCM / AES256-SIV `EncryptedSharedPreferences` for user session tokens and cookies with automatic legacy migration.
+- **Persistent Bookmarks Driver**:
+  - Implemented multiplatform `BookmarkStorageDriver` with Android Preferences storage driver to keep bookmarked hackathons persistent across app restarts and updates.
+- **Automated Backup & Data Extraction Security**:
+  - Added strict XML backup rules and data extraction exclusion rules ensuring session keys and sensitive tokens are never backed up to cloud or ADB backups.
+
+### Changed
+- **Zero-Flicker Action Bar**:
+  - Eliminated the loading circle spinner during passive background status checks in hackathon detail screens. Buttons render their cached or default state immediately from frame 1.
+- **Relocated Account Management**:
+  - Moved web session, username identity, token inspector, and cookie inspector entirely to the Portfolio screen, keeping the Settings screen exclusively dedicated to Themes, AMOLED mode, Fonts, and Haptics.
+- **Cleaned Sign-Out Lifecycle**:
+  - Complete session wipe on sign-out including Android `CookieManager` cookie flush, removal from encrypted preferences, and memory eviction.
+
+### Fixed
+- **Edge-to-Edge Double Inset Padding**:
+  - Removed duplicate navigation bar and status bar padding on the main screen container.
+- **ProGuard / R8 Build Rules**:
+  - Added `-dontwarn com.google.errorprone.annotations.**` rule resolving release R8 compilation errors.
+
+---
+
 ## [0.1.0-alpha] - 2026-11-02
 
 ### Added

@@ -9,7 +9,7 @@ An open source Android client for Devfolio built with Kotlin Multiplatform and n
 </p>
 
 > [!WARNING]
-> **Early Alpha Version (v0.1.0-alpha)**  
+> **Early Alpha Version (v0.1.1-alpha)**  
 > This is a very early, experimental community preview. You should expect bugs, incomplete features, and ongoing API iterations. We are actively polishing the UX and architecture. Contributions, bug reports, and feature requests are very welcome!
 
 ---

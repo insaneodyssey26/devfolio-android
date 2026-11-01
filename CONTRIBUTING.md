@@ -2,7 +2,7 @@
 
 Thank you for your interest in contributing to Devfolio Android! This is an open source community-driven client for Devfolio built with Kotlin Multiplatform (KMP) and Jetpack Compose.
 
-Since this project is currently in early alpha (`v0.1.0-alpha`), there is plenty of room for improvement, feature expansion, and bug fixing. We appreciate all kinds of contributions, whether it's reporting an issue, proposing design enhancements, or submitting code.
+Since this project is currently in early alpha (`v0.1.1-alpha`), there is plenty of room for improvement, feature expansion, and bug fixing. We appreciate all kinds of contributions, whether it's reporting an issue, proposing design enhancements, or submitting code.
 
 ---
 
