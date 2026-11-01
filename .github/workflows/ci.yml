@@ -31,14 +31,14 @@ jobs:
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
-      - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest --continue
+      - name: Run Unit Tests (Android & Shared KMP)
+        run: ./gradlew testDebugUnitTest :shared:testAndroidHostTest --continue
 
       - name: Lint Analysis
         run: ./gradlew lintDebug --continue
 
-      - name: Compile Debug APK
-        run: ./gradlew :androidApp:assembleDebug
+      - name: Verify Compilation
+        run: ./gradlew compileDebugSources compileReleaseSources
 
       - name: Upload Test Reports (on failure)
         if: failure()

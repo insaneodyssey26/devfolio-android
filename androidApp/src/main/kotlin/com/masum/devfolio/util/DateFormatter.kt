@@ -4,12 +4,15 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
-fun formatFriendlyDateTime(isoString: String?): String {
+fun formatFriendlyDateTime(
+    isoString: String?,
+    timeZone: TimeZone = TimeZone.currentSystemDefault()
+): String {
     if (isoString.isNullOrBlank()) return ""
 
     return runCatching {
         val instant = Instant.parse(isoString)
-        val local = instant.toLocalDateTime(TimeZone.currentSystemDefault())
+        val local = instant.toLocalDateTime(timeZone)
 
         val monthName = when (local.monthNumber) {
             1 -> "Jan"

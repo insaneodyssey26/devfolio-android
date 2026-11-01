@@ -60,6 +60,24 @@ class HackathonApplicationRepository(
         fun clearCache() {
             statusCache.clear()
         }
+
+        fun mapStatus(status: String?, rsvpStatus: String?): NativeApplicationStatus {
+            return when (status?.lowercase()?.trim()) {
+                "submit", "submitted", "applied", "under_review" -> NativeApplicationStatus.APPLIED_UNDER_REVIEW
+                "accept", "accepted" -> {
+                    if (rsvpStatus?.lowercase() == "attending" || rsvpStatus?.lowercase() == "confirmed") {
+                        NativeApplicationStatus.RSVP_CONFIRMED
+                    } else {
+                        NativeApplicationStatus.ACCEPTED_RSVP_PENDING
+                    }
+                }
+                "rsvp", "check_in" -> NativeApplicationStatus.RSVP_CONFIRMED
+                "waitlist", "waitlisted" -> NativeApplicationStatus.WAITLISTED
+                "withdraw", "withdrawn", "cancelled" -> NativeApplicationStatus.WITHDRAWN
+                "reject_sent", "rejected" -> NativeApplicationStatus.REJECTED
+                else -> NativeApplicationStatus.NOT_APPLIED
+            }
+        }
     }
 
     private val baseUrl = "https://api.devfolio.co/api"
@@ -75,21 +93,7 @@ class HackathonApplicationRepository(
             header("Cookie", user.rawCookies)
         }.body()
 
-        val mappedStatus = when (response.status?.lowercase()?.trim()) {
-            "submit", "submitted", "applied", "under_review" -> NativeApplicationStatus.APPLIED_UNDER_REVIEW
-            "accept", "accepted" -> {
-                if (response.rsvpStatus?.lowercase() == "attending" || response.rsvpStatus?.lowercase() == "confirmed") {
-                    NativeApplicationStatus.RSVP_CONFIRMED
-                } else {
-                    NativeApplicationStatus.ACCEPTED_RSVP_PENDING
-                }
-            }
-            "rsvp", "check_in" -> NativeApplicationStatus.RSVP_CONFIRMED
-            "waitlist", "waitlisted" -> NativeApplicationStatus.WAITLISTED
-            "withdraw", "withdrawn", "cancelled" -> NativeApplicationStatus.WITHDRAWN
-            "reject_sent", "rejected" -> NativeApplicationStatus.REJECTED
-            else -> NativeApplicationStatus.NOT_APPLIED
-        }
+        val mappedStatus = mapStatus(response.status, response.rsvpStatus)
 
         val detail = ApplicationStatusDetail(
             status = mappedStatus,

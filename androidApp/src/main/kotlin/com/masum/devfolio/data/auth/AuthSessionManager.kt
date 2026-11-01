@@ -81,71 +81,32 @@ class AuthSessionManager private constructor(context: Context) {
     }
 
     private suspend fun parseCookiesSuspend(cookieHeader: String): Boolean {
-        var token: String? = null
-        var username: String? = null
-        var uuid: String? = null
+        val (token, uuidFound, usernameFound) = parseCookies(cookieHeader)
+        var finalUsername = usernameFound
+        val finalUuid = uuidFound
+        val finalToken = token
 
-        val cookies = cookieHeader.split(";").map { it.trim() }
-        for (cookie in cookies) {
-            val parts = cookie.split("=", limit = 2)
-            if (parts.size != 2) continue
-            val name = parts[0].trim()
-            val rawVal = parts[1].trim()
-
-            when (name) {
-                "access_token" -> {
-                    token = rawVal
-                }
-                "devfolio_auth" -> {
-                    runCatching {
-                        val unquoted = URLDecoder.decode(rawVal, "UTF-8")
-                        val payloadB64 = if (unquoted.startsWith("s:")) {
-                            unquoted.substring(2).split(".")[0]
-                        } else {
-                            unquoted.split(".")[0]
-                        }
-                        val padded = payloadB64 + "=".repeat((-payloadB64.length) and 3)
-                        val decodedBytes = Base64.decode(padded, Base64.DEFAULT)
-                        val decodedJson = String(decodedBytes, Charsets.UTF_8)
-                        val parsedObj = json.parseToJsonElement(decodedJson).jsonObject
-                        token = parsedObj["access_token"]?.jsonPrimitive?.content
-                    }
-                }
-                "devfolio_user" -> {
-                    runCatching {
-                        val unquoted = URLDecoder.decode(rawVal, "UTF-8")
-                        val padded = unquoted + "=".repeat((-unquoted.length) and 3)
-                        val decodedBytes = Base64.decode(padded, Base64.DEFAULT)
-                        val decodedJson = String(decodedBytes, Charsets.UTF_8)
-                        val parsedObj = json.parseToJsonElement(decodedJson).jsonObject
-                        uuid = parsedObj["uuid"]?.jsonPrimitive?.content
-                        username = parsedObj["username"]?.jsonPrimitive?.content
-                    }
-                }
-            }
-        }
-
-        if (token.isNullOrBlank() || uuid.isNullOrBlank()) {
+        if (finalToken.isNullOrBlank() || finalUuid.isNullOrBlank()) {
             return false
         }
 
-        if (username.isNullOrBlank()) {
-            username = fetchUsernameByUuid(uuid, token)
+        if (finalUsername.isNullOrBlank()) {
+            finalUsername = fetchUsernameByUuid(finalUuid, finalToken)
         }
 
-        if (!username.isNullOrBlank()) {
+        if (!finalUsername.isNullOrBlank()) {
             prefs.edit()
-                .putString(KEY_ACCESS_TOKEN, token)
-                .putString(KEY_USERNAME, username)
-                .putString(KEY_UUID, uuid)
+                .putString(KEY_ACCESS_TOKEN, finalToken)
+                .putString(KEY_USERNAME, finalUsername)
+                .putString(KEY_UUID, finalUuid)
                 .putString(KEY_RAW_COOKIES, cookieHeader)
                 .apply()
 
             _authState.value = AuthState.Authenticated(
                 AuthUser(
-                    username = username,
-                    uuid = uuid,
-                    accessToken = token,
+                    username = finalUsername,
+                    uuid = finalUuid,
+                    accessToken = finalToken,
                     rawCookies = cookieHeader
                 )
             )
@@ -186,6 +147,54 @@ class AuthSessionManager private constructor(context: Context) {
             return instance ?: synchronized(this) {
                 instance ?: AuthSessionManager(context.applicationContext).also { instance = it }
             }
+        }
+
+        fun parseCookies(rawCookieHeader: String): Triple<String?, String?, String?> {
+            val json = Json { ignoreUnknownKeys = true; isLenient = true }
+            var token: String? = null
+            var uuid: String? = null
+            var username: String? = null
+
+            val cookies = rawCookieHeader.split(";").map { it.trim() }
+            for (cookie in cookies) {
+                val eqIdx = cookie.indexOf('=')
+                if (eqIdx == -1) continue
+                val name = cookie.substring(0, eqIdx).trim()
+                val rawVal = cookie.substring(eqIdx + 1).trim()
+
+                when (name) {
+                    "access_token" -> {
+                        token = rawVal
+                    }
+                    "devfolio_auth" -> {
+                        runCatching {
+                            val unquoted = URLDecoder.decode(rawVal, "UTF-8")
+                            val payloadB64 = if (unquoted.startsWith("s:")) {
+                                unquoted.substring(2).split(".")[0]
+                            } else {
+                                unquoted.split(".")[0]
+                            }
+                            val padded = payloadB64 + "=".repeat((-payloadB64.length) and 3)
+                            val decodedBytes = Base64.decode(padded, Base64.DEFAULT)
+                            val decodedJson = String(decodedBytes, Charsets.UTF_8)
+                            val parsedObj = json.parseToJsonElement(decodedJson).jsonObject
+                            token = parsedObj["access_token"]?.jsonPrimitive?.content
+                        }
+                    }
+                    "devfolio_user" -> {
+                        runCatching {
+                            val unquoted = URLDecoder.decode(rawVal, "UTF-8")
+                            val padded = unquoted + "=".repeat((-unquoted.length) and 3)
+                            val decodedBytes = Base64.decode(padded, Base64.DEFAULT)
+                            val decodedJson = String(decodedBytes, Charsets.UTF_8)
+                            val parsedObj = json.parseToJsonElement(decodedJson).jsonObject
+                            uuid = parsedObj["uuid"]?.jsonPrimitive?.content
+                            username = parsedObj["username"]?.jsonPrimitive?.content
+                        }
+                    }
+                }
+            }
+            return Triple(token, uuid, username)
         }
     }
 }

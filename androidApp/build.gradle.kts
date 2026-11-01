@@ -34,6 +34,9 @@ dependencies {
     implementation(libs.kotlinx.datetime)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlin.test)
+    testImplementation(libs.kotlinx.coroutines.test)
 }
 
 android {
