@@ -12,7 +12,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.masum.devfolio.ui.detail.HackathonDetailScreen
-import com.masum.devfolio.ui.discover.DiscoverScreen
+import com.masum.devfolio.ui.main.MainScreen
 
 @Composable
 fun DevfolioNavHost(
@@ -38,7 +38,7 @@ fun DevfolioNavHost(
                 ) + fadeIn(animationSpec = tween(350))
             }
         ) {
-            DiscoverScreen(
+            MainScreen(
                 onHackathonClick = { hackathon ->
                     navController.navigate(DetailDestination(slug = hackathon.slug))
                 }

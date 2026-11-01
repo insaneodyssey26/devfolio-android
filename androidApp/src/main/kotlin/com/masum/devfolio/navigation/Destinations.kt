@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 data object DiscoverDestination
 
 @Serializable
+data object ProjectsDestination
+
+@Serializable
 data class DetailDestination(val slug: String)
