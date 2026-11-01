@@ -157,6 +157,17 @@ fun DevfolioSignInDialog(
                                     checkCookies(url)
                                 }
 
+                                 override fun onReceivedError(
+                                    view: WebView?,
+                                    request: WebResourceRequest?,
+                                    error: android.webkit.WebResourceError?
+                                ) {
+                                    super.onReceivedError(view, request, error)
+                                    if (request?.isForMainFrame == true) {
+                                        isLoading = false
+                                    }
+                                }
+
                                 override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                     checkCookies(request?.url?.toString())
                                     return false

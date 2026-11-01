@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -89,7 +90,9 @@ fun ApplyActionBar(
         HackathonApplicationRepository.getCachedStatus(it.user.username, hackathon.slug)
     }
     var applicationDetail by remember(hackathon.slug) { mutableStateOf(cachedDetail) }
-    var isCheckingStatus by remember { mutableStateOf(false) }
+    var isCheckingStatus by remember(hackathon.slug, authState) {
+        mutableStateOf(false)
+    }
     var isActionInProgress by remember { mutableStateOf(false) }
     var showSignInDialog by remember { mutableStateOf(false) }
     var showWithdrawConfirmDialog by remember { mutableStateOf(false) }
@@ -222,6 +225,29 @@ fun ApplyActionBar(
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
+            } else if (status == NativeApplicationStatus.SESSION_EXPIRED) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f))
+                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Lock,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Session Expired · Sign in again to view status",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+                Spacer(modifier = Modifier.height(12.dp))
             } else if (status == NativeApplicationStatus.WAITLISTED) {
                 Row(
                     modifier = Modifier
@@ -253,116 +279,129 @@ fun ApplyActionBar(
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    when {
-                        authState !is AuthState.Authenticated -> {
-                            Button(
-                                onClick = {
-                                    haptics.lightTick()
-                                    showSignInDialog = true
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(27.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = accentColor)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.Lock,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Sign in to Apply",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                                )
-                            }
-                        }
+                    val currentButtonState = when {
+                        isActionInProgress -> "loading"
+                        authState !is AuthState.Authenticated -> "sign_in"
+                        status == NativeApplicationStatus.APPLIED_UNDER_REVIEW -> "withdraw"
+                        status == NativeApplicationStatus.ACCEPTED_RSVP_PENDING -> "rsvp"
+                        else -> "apply"
+                    }
 
-                        isCheckingStatus || isActionInProgress -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(54.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color = accentColor,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                    Crossfade(
+                        targetState = currentButtonState,
+                        label = "action_bar_button_crossfade"
+                    ) { stateKey ->
+                        when (stateKey) {
+                            "sign_in" -> {
+                                Button(
+                                    onClick = {
+                                        haptics.lightTick()
+                                        showSignInDialog = true
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(27.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.Lock,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Sign in to Apply",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
                             }
-                        }
 
-                        status == NativeApplicationStatus.APPLIED_UNDER_REVIEW -> {
-                            FilledTonalButton(
-                                onClick = {
-                                    haptics.lightTick()
-                                    showWithdrawConfirmDialog = true
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(27.dp),
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer,
-                                    contentColor = MaterialTheme.colorScheme.onErrorContainer
-                                )
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Rounded.DeleteOutline,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "Withdraw Application",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                                )
+                            "loading" -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(54.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color = accentColor,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
                             }
-                        }
 
-                        status == NativeApplicationStatus.ACCEPTED_RSVP_PENDING -> {
-                            Button(
-                                onClick = {
-                                    val user = (authState as? AuthState.Authenticated)?.user ?: return@Button
-                                    scope.launch {
-                                        isActionInProgress = true
-                                        appRepo.confirmRsvp(user, hackathon.slug).onSuccess {
-                                            haptics.heavyClick()
-                                            applicationDetail = applicationDetail?.copy(status = NativeApplicationStatus.RSVP_CONFIRMED)
+                            "withdraw" -> {
+                                FilledTonalButton(
+                                    onClick = {
+                                        haptics.lightTick()
+                                        showWithdrawConfirmDialog = true
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(27.dp),
+                                    colors = ButtonDefaults.filledTonalButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Rounded.DeleteOutline,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Withdraw Application",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
+                            }
+
+                            "rsvp" -> {
+                                Button(
+                                    onClick = {
+                                        val user = (authState as? AuthState.Authenticated)?.user ?: return@Button
+                                        scope.launch {
+                                            isActionInProgress = true
+                                            appRepo.confirmRsvp(user, hackathon.slug).onSuccess {
+                                                haptics.heavyClick()
+                                                applicationDetail = applicationDetail?.copy(status = NativeApplicationStatus.RSVP_CONFIRMED)
+                                            }
+                                            isActionInProgress = false
                                         }
-                                        isActionInProgress = false
-                                    }
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(27.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
-                            ) {
-                                Text(
-                                    text = "Confirm RSVP",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                                )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(27.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                                ) {
+                                    Text(
+                                        text = "Confirm RSVP",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
                             }
-                        }
 
-                        else -> {
-                            Button(
-                                onClick = {
-                                    haptics.lightTick()
-                                    launchDevfolioCustomTab(context, "https://${hackathon.slug}.devfolio.co")
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(54.dp),
-                                shape = RoundedCornerShape(27.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = accentColor)
-                            ) {
-                                Text(
-                                    text = "Apply on Devfolio",
-                                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
-                                )
+                            else -> {
+                                Button(
+                                    onClick = {
+                                        haptics.lightTick()
+                                        launchDevfolioCustomTab(context, "https://${hackathon.slug}.devfolio.co")
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(54.dp),
+                                    shape = RoundedCornerShape(27.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                                ) {
+                                    Text(
+                                        text = "Apply on Devfolio",
+                                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                                    )
+                                }
                             }
                         }
                     }

@@ -32,3 +32,7 @@
 # Compose & Coil
 -dontwarn coil3.**
 -keep class coil3.** { *; }
+
+# Google Tink & Security Crypto annotations
+-dontwarn com.google.errorprone.annotations.**
+

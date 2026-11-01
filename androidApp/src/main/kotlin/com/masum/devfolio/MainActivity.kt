@@ -12,13 +12,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.masum.devfolio.data.settings.ThemePreferences
+import com.masum.devfolio.data.storage.AndroidPreferencesBookmarkStorageDriver
 import com.masum.devfolio.navigation.DevfolioNavHost
+import com.masum.devfolio.repository.BookmarkRepositoryImpl
 import com.masum.devfolio.theme.DevfolioTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        BookmarkRepositoryImpl.initialize(AndroidPreferencesBookmarkStorageDriver(applicationContext))
         setContent {
             val themePreferences = remember { ThemePreferences.getInstance(applicationContext) }
             val settings by themePreferences.settings.collectAsState()

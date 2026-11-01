@@ -9,6 +9,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -34,7 +36,8 @@ enum class NativeApplicationStatus {
     RSVP_CONFIRMED,
     WAITLISTED,
     WITHDRAWN,
-    REJECTED
+    REJECTED,
+    SESSION_EXPIRED
 }
 
 data class ApplicationStatusDetail(
@@ -87,12 +90,19 @@ class HackathonApplicationRepository(
         hackathonSlug: String
     ): Result<ApplicationStatusDetail> = runCatching {
         val cacheKey = "${user.username}:$hackathonSlug"
-        val response: HackerDashboardResponse = client.get("$baseUrl/users/${user.username}/hackathon/$hackathonSlug") {
+        val httpResponse: HttpResponse = client.get("$baseUrl/users/${user.username}/hackathon/$hackathonSlug") {
             header("Authorization", user.accessToken)
             header("access_token", user.accessToken)
             header("Cookie", user.rawCookies)
-        }.body()
+        }
 
+        if (httpResponse.status == HttpStatusCode.Unauthorized || httpResponse.status == HttpStatusCode.Forbidden) {
+            val expiredDetail = ApplicationStatusDetail(status = NativeApplicationStatus.SESSION_EXPIRED)
+            statusCache[cacheKey] = expiredDetail
+            return@runCatching expiredDetail
+        }
+
+        val response: HackerDashboardResponse = httpResponse.body()
         val mappedStatus = mapStatus(response.status, response.rsvpStatus)
 
         val detail = ApplicationStatusDetail(

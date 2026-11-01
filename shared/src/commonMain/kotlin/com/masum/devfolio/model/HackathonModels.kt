@@ -82,6 +82,7 @@ data class ParticipantDetail(
     @SerialName("profile_image") val profileImage: String? = null
 )
 
+@Serializable
 data class Hackathon(
     val uuid: String,
     val name: String,

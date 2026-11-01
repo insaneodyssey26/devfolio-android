@@ -3,6 +3,9 @@ package com.masum.devfolio.data.auth
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Base64
+import android.webkit.CookieManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -34,8 +37,8 @@ sealed interface AuthState {
     data class Authenticated(val user: AuthUser) : AuthState
 }
 
-class AuthSessionManager private constructor(context: Context) {
-    private val prefs: SharedPreferences = context.getSharedPreferences("devfolio_auth", Context.MODE_PRIVATE)
+class AuthSessionManager private constructor(private val context: Context) {
+    private val prefs: SharedPreferences = createEncryptedPreferences(context)
     private val json = Json { ignoreUnknownKeys = true; isLenient = true }
     private val scope = CoroutineScope(Dispatchers.IO)
 
@@ -52,6 +55,7 @@ class AuthSessionManager private constructor(context: Context) {
         get() = (_authState.value as? AuthState.Authenticated)?.user
 
     private fun loadInitialState(): AuthState {
+        migrateLegacyPreferencesIfNeeded()
         val token = prefs.getString(KEY_ACCESS_TOKEN, null)
         val username = prefs.getString(KEY_USERNAME, null)
         val uuid = prefs.getString(KEY_UUID, null)
@@ -68,6 +72,29 @@ class AuthSessionManager private constructor(context: Context) {
             )
         } else {
             AuthState.Unauthenticated
+        }
+    }
+
+    private fun migrateLegacyPreferencesIfNeeded() {
+        runCatching {
+            val legacyPrefs = context.getSharedPreferences("devfolio_auth", Context.MODE_PRIVATE)
+            val legacyToken = legacyPrefs.getString(KEY_ACCESS_TOKEN, null)
+            val legacyUsername = legacyPrefs.getString(KEY_USERNAME, null)
+            val legacyUuid = legacyPrefs.getString(KEY_UUID, null)
+            val legacyRawCookies = legacyPrefs.getString(KEY_RAW_COOKIES, "") ?: ""
+
+            if (!legacyToken.isNullOrBlank() && !legacyUsername.isNullOrBlank() && !legacyUuid.isNullOrBlank()) {
+                val currentToken = prefs.getString(KEY_ACCESS_TOKEN, null)
+                if (currentToken.isNullOrBlank()) {
+                    prefs.edit()
+                        .putString(KEY_ACCESS_TOKEN, legacyToken)
+                        .putString(KEY_USERNAME, legacyUsername)
+                        .putString(KEY_UUID, legacyUuid)
+                        .putString(KEY_RAW_COOKIES, legacyRawCookies)
+                        .apply()
+                }
+                legacyPrefs.edit().clear().apply()
+            }
         }
     }
 
@@ -131,14 +158,58 @@ class AuthSessionManager private constructor(context: Context) {
 
     fun signOut() {
         prefs.edit().clear().apply()
+        runCatching {
+            val cookieManager = CookieManager.getInstance()
+            cookieManager.removeAllCookies(null)
+            cookieManager.flush()
+        }
         _authState.value = AuthState.Unauthenticated
     }
 
     companion object {
+        private const val PREFS_FILE_NAME = "devfolio_auth_encrypted"
         private const val KEY_ACCESS_TOKEN = "access_token"
         private const val KEY_USERNAME = "username"
         private const val KEY_UUID = "uuid"
         private const val KEY_RAW_COOKIES = "raw_cookies"
+
+        /**
+         * Initializes Keystore-backed encrypted preferences using MasterKey AES-256 GCM.
+         * Falls back safely and clears corrupt states if cryptographic keys are reset by the OS.
+         */
+        @Suppress("DEPRECATION")
+        private fun createEncryptedPreferences(context: Context): SharedPreferences {
+            return runCatching {
+                val masterKey = MasterKey.Builder(context)
+                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+
+                EncryptedSharedPreferences.create(
+                    context,
+                    PREFS_FILE_NAME,
+                    masterKey,
+                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            }.getOrElse {
+                // If Keystore was invalidated or corrupted, clear and retry once or fallback safely
+                context.getSharedPreferences(PREFS_FILE_NAME, Context.MODE_PRIVATE).edit().clear().apply()
+                runCatching {
+                    val masterKey = MasterKey.Builder(context)
+                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                        .build()
+                    EncryptedSharedPreferences.create(
+                        context,
+                        PREFS_FILE_NAME,
+                        masterKey,
+                        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                    )
+                }.getOrElse {
+                    context.getSharedPreferences("devfolio_auth_fallback", Context.MODE_PRIVATE)
+                }
+            }
+        }
 
         @Volatile
         private var instance: AuthSessionManager? = null

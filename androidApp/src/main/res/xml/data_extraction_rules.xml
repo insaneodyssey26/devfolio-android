@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="devfolio_auth.xml" />
+        <exclude domain="sharedpref" path="devfolio_auth_encrypted.xml" />
+        <exclude domain="sharedpref" path="devfolio_auth_fallback.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="devfolio_auth.xml" />
+        <exclude domain="sharedpref" path="devfolio_auth_encrypted.xml" />
+        <exclude domain="sharedpref" path="devfolio_auth_fallback.xml" />
+    </device-transfer>
+</data-extraction-rules>

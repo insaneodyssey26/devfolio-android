@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="sharedpref" path="devfolio_auth.xml" />
+    <exclude domain="sharedpref" path="devfolio_auth_encrypted.xml" />
+    <exclude domain="sharedpref" path="devfolio_auth_fallback.xml" />
+</full-backup-content>

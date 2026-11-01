@@ -47,6 +47,26 @@ class BookmarkRepositoryTest {
     }
 
     @Test
+    fun testBookmarkPersistenceWithStorageDriver() = runTest {
+        val testDriver = InMemoryBookmarkStorageDriver()
+        BookmarkRepositoryImpl.initialize(testDriver)
+
+        val hackathon = sampleHackathon("persist-test")
+        BookmarkRepositoryImpl.toggleBookmark(hackathon)
+
+        assertTrue(testDriver.loadBookmarks()?.contains("persist-test") == true)
+
+        // Simulate new app launch with same driver
+        BookmarkRepositoryImpl.initialize(testDriver)
+        val loaded = BookmarkRepositoryImpl.getBookmarks().first()
+        assertEquals(1, loaded.size)
+        assertEquals("persist-test", loaded.first().slug)
+
+        // Clean up
+        BookmarkRepositoryImpl.toggleBookmark(hackathon)
+    }
+
+    @Test
     fun testToggleBookmarkAddsAndRemoves() = runTest {
         val repo = BookmarkRepositoryImpl
         val hack = sampleHackathon("hack-1")

@@ -11,15 +11,15 @@ class DevfolioRepositoryImpl(
     private val apiService: DevfolioApiService = DevfolioApiServiceImpl()
 ) : DevfolioRepository {
 
-    override fun getHackathonsStream(type: String): Flow<Result<List<Hackathon>>> = flow {
-        emit(apiService.searchHackathons(type = type))
+    override fun getHackathonsStream(type: String, from: Int, size: Int): Flow<Result<List<Hackathon>>> = flow {
+        emit(apiService.searchHackathons(type = type, from = from, size = size))
     }
 
     override suspend fun getHackathon(slug: String): Result<Hackathon> {
         return apiService.getHackathonDetail(slug)
     }
 
-    override fun getProjectsStream(): Flow<Result<List<Project>>> = flow {
-        emit(apiService.searchProjects())
+    override fun getProjectsStream(from: Int, size: Int): Flow<Result<List<Project>>> = flow {
+        emit(apiService.searchProjects(from = from, size = size))
     }
 }
