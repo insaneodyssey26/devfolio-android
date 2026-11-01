@@ -33,6 +33,7 @@ fun HackathonDetailScreen(
     viewModel: DetailViewModel = remember(slug) { DetailViewModel(slug) }
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isBookmarked by viewModel.isBookmarked.collectAsState()
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -46,8 +47,7 @@ fun HackathonDetailScreen(
                 }
 
                 ApplyActionBar(
-                    slug = hackathon.slug,
-                    name = hackathon.name,
+                    hackathon = hackathon,
                     accentColor = accentColor
                 )
             }
@@ -73,6 +73,8 @@ fun HackathonDetailScreen(
                 is DetailUiState.Success -> {
                     DetailSuccessContent(
                         hackathon = state.hackathon,
+                        isBookmarked = isBookmarked,
+                        onBookmarkToggle = { viewModel.toggleBookmark(state.hackathon) },
                         onBackClick = onBackClick
                     )
                 }
@@ -84,6 +86,8 @@ fun HackathonDetailScreen(
 @Composable
 private fun DetailSuccessContent(
     hackathon: Hackathon,
+    isBookmarked: Boolean,
+    onBookmarkToggle: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -104,6 +108,8 @@ private fun DetailSuccessContent(
             coverUrl = hackathon.coverImg,
             logoUrl = hackathon.logoImg,
             accentColor = accentColor,
+            isBookmarked = isBookmarked,
+            onBookmarkToggle = onBookmarkToggle,
             onBackClick = onBackClick
         )
 

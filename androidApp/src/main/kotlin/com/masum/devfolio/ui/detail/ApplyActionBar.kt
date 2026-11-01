@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ButtonDefaults
@@ -31,14 +32,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.masum.devfolio.model.Hackathon
 import com.masum.devfolio.theme.rememberDevfolioHaptics
+import com.masum.devfolio.util.addHackathonToCalendar
 import com.masum.devfolio.util.launchDevfolioCustomTab
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ApplyActionBar(
-    slug: String,
-    name: String,
+    hackathon: Hackathon,
     accentColor: Color,
     modifier: Modifier = Modifier
 ) {
@@ -46,7 +48,7 @@ fun ApplyActionBar(
     val haptics = rememberDevfolioHaptics()
     var isMenuExpanded by remember { mutableStateOf(false) }
 
-    val applyUrl = "https://$slug.devfolio.co"
+    val applyUrl = "https://${hackathon.slug}.devfolio.co"
 
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -97,6 +99,18 @@ fun ApplyActionBar(
                 onDismissRequest = { isMenuExpanded = false }
             ) {
                 DropdownMenuItem(
+                    text = { Text("Add to Calendar") },
+                    leadingIcon = {
+                        Icon(imageVector = Icons.Default.CalendarToday, contentDescription = null)
+                    },
+                    onClick = {
+                        haptics.lightTick()
+                        isMenuExpanded = false
+                        addHackathonToCalendar(context, hackathon)
+                    }
+                )
+
+                DropdownMenuItem(
                     text = { Text("Share Hackathon") },
                     leadingIcon = {
                         Icon(imageVector = Icons.Default.Share, contentDescription = null)
@@ -106,8 +120,8 @@ fun ApplyActionBar(
                         isMenuExpanded = false
                         val shareIntent = Intent(Intent.ACTION_SEND).apply {
                             type = "text/plain"
-                            putExtra(Intent.EXTRA_SUBJECT, name)
-                            putExtra(Intent.EXTRA_TEXT, "Check out $name on Devfolio: $applyUrl")
+                            putExtra(Intent.EXTRA_SUBJECT, hackathon.name)
+                            putExtra(Intent.EXTRA_TEXT, "Check out ${hackathon.name} on Devfolio: $applyUrl")
                         }
                         context.startActivity(Intent.createChooser(shareIntent, "Share Hackathon"))
                     }

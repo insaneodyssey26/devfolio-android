@@ -3,6 +3,7 @@ package com.masum.devfolio.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -18,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.masum.devfolio.theme.rememberDevfolioHaptics
 
 enum class MainNavigationTab {
-    DISCOVER, PROJECTS
+    DISCOVER, PROJECTS, SAVED
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -56,6 +57,20 @@ fun DevfolioBottomBar(
             },
             icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Projects") },
             label = { Text("Showcase", style = MaterialTheme.typography.labelSmall) },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = MaterialTheme.colorScheme.primary,
+                indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+            )
+        )
+
+        NavigationBarItem(
+            selected = currentTab == MainNavigationTab.SAVED,
+            onClick = {
+                haptics.lightTick()
+                onTabSelected(MainNavigationTab.SAVED)
+            },
+            icon = { Icon(Icons.Default.Bookmark, contentDescription = "Saved") },
+            label = { Text("Saved", style = MaterialTheme.typography.labelSmall) },
             colors = NavigationBarItemDefaults.colors(
                 selectedIconColor = MaterialTheme.colorScheme.primary,
                 indicatorColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)

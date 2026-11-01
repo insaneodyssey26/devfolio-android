@@ -16,6 +16,7 @@ import com.masum.devfolio.ui.components.DevfolioBottomBar
 import com.masum.devfolio.ui.components.MainNavigationTab
 import com.masum.devfolio.ui.discover.DiscoverScreen
 import com.masum.devfolio.ui.projects.ProjectsScreen
+import com.masum.devfolio.ui.saved.SavedScreen
 
 @Composable
 fun MainScreen(
@@ -47,6 +48,12 @@ fun MainScreen(
 
                 MainNavigationTab.PROJECTS -> {
                     ProjectsScreen()
+                }
+
+                MainNavigationTab.SAVED -> {
+                    SavedScreen(
+                        onHackathonClick = onHackathonClick
+                    )
                 }
             }
         }

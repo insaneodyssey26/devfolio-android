@@ -39,6 +39,8 @@ fun DetailHeroBanner(
     coverUrl: String?,
     logoUrl: String?,
     accentColor: Color,
+    isBookmarked: Boolean,
+    onBookmarkToggle: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -57,17 +59,29 @@ fun DetailHeroBanner(
             )
         }
 
-        IconButton(
-            onClick = onBackClick,
+        Row(
             modifier = Modifier
-                .padding(16.dp)
-                .size(40.dp)
-                .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                tint = Color.White
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+
+            com.masum.devfolio.ui.components.BookmarkButton(
+                isBookmarked = isBookmarked,
+                onToggle = onBookmarkToggle
             )
         }
 
