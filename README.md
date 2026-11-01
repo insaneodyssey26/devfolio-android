@@ -131,7 +131,7 @@ Contributions are warmly welcomed! Since this is an alpha release, there is subs
 - Polishing edge cases in application form interactions
 - Expanding team management & invite flows
 - Adding tablet / foldable adaptive multi-pane layouts
-- Porting the shared KMP core to Compose Multiplatform for Desktop or iOS
+- Native Swift / SwiftUI frontend for iOS (consuming the shared KMP core)
 
 To contribute:
 1. Fork the repository

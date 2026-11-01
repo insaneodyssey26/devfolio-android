@@ -18,7 +18,7 @@ Here are some areas where your help would be very valuable:
 - **Bug Fixes**: Addressing UI glitches, token refresh edge cases, or navigation hiccups.
 - **Application Flow**: Expanding team creation, invite management, and organizer-specific custom form queries.
 - **Adaptive Layouts**: Implementing responsive 2-pane / multi-pane Compose layouts for foldables, tablets, and Chromebooks.
-- **Desktop & Multiplatform**: Exploring Desktop (Compose Multiplatform) or iOS support using the shared KMP core.
+- **iOS Client (Swift / SwiftUI)**: Building a native iOS frontend consuming the shared KMP core framework.
 - **Testing**: Writing unit tests for ViewModels, repositories, and UI test harnesses.
 
 ---
