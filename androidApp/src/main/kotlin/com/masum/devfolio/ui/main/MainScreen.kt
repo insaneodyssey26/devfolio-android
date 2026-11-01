@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -43,8 +44,12 @@ fun MainScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize()
-    ) { _ ->
-        Box(modifier = Modifier.fillMaxSize()) {
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
             AnimatedContent(
                 targetState = selectedDestination,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
