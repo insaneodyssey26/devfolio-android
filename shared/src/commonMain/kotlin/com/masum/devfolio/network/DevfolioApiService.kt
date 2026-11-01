@@ -18,4 +18,6 @@ interface DevfolioApiService {
         from: Int = 0,
         size: Int = 50
     ): Result<List<Project>>
+
+    suspend fun getProjectDetail(slug: String): Result<com.masum.devfolio.model.ProjectDetail>
 }

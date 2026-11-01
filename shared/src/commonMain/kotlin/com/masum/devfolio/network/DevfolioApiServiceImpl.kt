@@ -66,4 +66,9 @@ class DevfolioApiServiceImpl(
 
         response.hits?.hits?.mapNotNull { it.source?.toDomain() }.orEmpty()
     }
+
+    override suspend fun getProjectDetail(slug: String): Result<com.masum.devfolio.model.ProjectDetail> = runCatching {
+        val response: com.masum.devfolio.model.ProjectDetailResponse = client.get("$baseUrl/projects/$slug").body()
+        response.toDomain()
+    }
 }

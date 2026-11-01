@@ -64,6 +64,11 @@ fun DevfolioFloatingNavBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = {}
+            )
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -187,7 +192,7 @@ private fun FloatingNavItem(
                 Text(
                     text = destination.title,
                     color = contentColor,
-                    fontSize = 13.sp,
+                    style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.SemiBold
                 )
             }

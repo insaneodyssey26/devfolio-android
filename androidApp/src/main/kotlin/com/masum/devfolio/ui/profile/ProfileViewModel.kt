@@ -33,6 +33,18 @@ class ProfileViewModel(
         _handleInput.value = newHandle
     }
 
+    fun refreshProfile() {
+        val handle = _handleInput.value.trim().removePrefix("@")
+        if (handle.isNotBlank()) {
+            fetchProfile(handle)
+        }
+    }
+
+    fun onSignedIn(username: String) {
+        _handleInput.value = username
+        fetchProfile(username)
+    }
+
     fun linkProfile() {
         val handle = _handleInput.value.trim().removePrefix("@")
         if (handle.isNotBlank()) {

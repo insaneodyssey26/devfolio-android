@@ -37,6 +37,8 @@ import com.masum.devfolio.model.HackathonFaq
 import com.masum.devfolio.theme.SquircleBadgeShape
 import com.masum.devfolio.theme.rememberDevfolioHaptics
 import com.masum.devfolio.ui.components.BookmarkButton
+import com.masum.devfolio.ui.components.MarkdownText
+import com.masum.devfolio.util.formatFriendlyDateTime
 import com.masum.devfolio.util.launchDevfolioCustomTab
 
 @Composable
@@ -189,7 +191,7 @@ fun DetailScheduleSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = regEndsAt,
+                        text = formatFriendlyDateTime(regEndsAt),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -203,7 +205,7 @@ fun DetailScheduleSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = endsAt,
+                        text = formatFriendlyDateTime(endsAt),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -285,10 +287,8 @@ fun DetailDescriptionSection(
             ),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
         ) {
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+            MarkdownText(
+                markdown = description,
                 modifier = Modifier.padding(16.dp)
             )
         }

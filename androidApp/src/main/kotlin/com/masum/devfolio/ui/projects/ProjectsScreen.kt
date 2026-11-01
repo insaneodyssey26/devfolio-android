@@ -26,11 +26,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.masum.devfolio.model.Project
 import com.masum.devfolio.ui.components.FullScreenLoader
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProjectsScreen(
+    onProjectClick: (Project) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProjectsViewModel = viewModel()
 ) {
@@ -83,6 +85,7 @@ fun ProjectsScreen(
                 is ProjectsUiState.Success -> {
                     ProjectsSuccessContent(
                         state = state,
+                        onProjectClick = onProjectClick,
                         onRefresh = viewModel::refresh
                     )
                 }
@@ -95,6 +98,7 @@ fun ProjectsScreen(
 @Composable
 private fun ProjectsSuccessContent(
     state: ProjectsUiState.Success,
+    onProjectClick: (Project) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -127,7 +131,10 @@ private fun ProjectsSuccessContent(
                     items = state.projects,
                     key = { it.uuid }
                 ) { project ->
-                    ProjectCard(project = project)
+                    ProjectCard(
+                        project = project,
+                        onClick = { onProjectClick(project) }
+                    )
                 }
             }
         }

@@ -1,23 +1,65 @@
 package com.masum.devfolio.theme
 
+import android.os.Build
+import android.view.HapticFeedbackConstants
+import android.view.View
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.hapticfeedback.HapticFeedback
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalView
+import com.masum.devfolio.data.settings.ThemePreferences
 
-class DevfolioHaptics(private val haptic: HapticFeedback) {
+class DevfolioHaptics(
+    private val view: View,
+    private val isEnabled: () -> Boolean
+) {
     fun lightTick() {
-        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+        if (!isEnabled()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            view.performHapticFeedback(HapticFeedbackConstants.SEGMENT_FREQUENT_TICK)
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
+    }
+
+    fun toggle() {
+        if (!isEnabled()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            view.performHapticFeedback(HapticFeedbackConstants.TOGGLE_ON)
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY)
+        }
     }
 
     fun heavyClick() {
-        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        if (!isEnabled()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
+    }
+
+    fun reject() {
+        if (!isEnabled()) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            view.performHapticFeedback(HapticFeedbackConstants.REJECT)
+        } else {
+            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        }
     }
 }
 
 @Composable
 fun rememberDevfolioHaptics(): DevfolioHaptics {
-    val haptic = LocalHapticFeedback.current
-    return remember(haptic) { DevfolioHaptics(haptic) }
+    val view = LocalView.current
+    val context = LocalContext.current
+    val preferences = remember { ThemePreferences.getInstance(context) }
+    val settings by preferences.settings.collectAsState()
+
+    return remember(view, settings.hapticsEnabled) {
+        DevfolioHaptics(view) { settings.hapticsEnabled }
+    }
 }

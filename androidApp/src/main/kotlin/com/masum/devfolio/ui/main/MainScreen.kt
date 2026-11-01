@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.masum.devfolio.data.repository.ProfileRepositoryImpl
 import com.masum.devfolio.model.Hackathon
+import com.masum.devfolio.model.Project
 import com.masum.devfolio.ui.components.DevfolioFloatingNavBar
 import com.masum.devfolio.ui.components.MainNavDestination
 import com.masum.devfolio.ui.discover.DiscoverScreen
@@ -29,6 +30,8 @@ import com.masum.devfolio.ui.saved.SavedScreen
 @Composable
 fun MainScreen(
     onHackathonClick: (Hackathon) -> Unit,
+    onProjectClick: (Project) -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var selectedDestination by rememberSaveable { mutableStateOf(MainNavDestination.Discover) }
@@ -56,7 +59,9 @@ fun MainScreen(
                     }
 
                     MainNavDestination.Projects -> {
-                        ProjectsScreen()
+                        ProjectsScreen(
+                            onProjectClick = onProjectClick
+                        )
                     }
 
                     MainNavDestination.Saved -> {
@@ -67,6 +72,7 @@ fun MainScreen(
 
                     MainNavDestination.Profile -> {
                         ProfileScreen(
+                            onSettingsClick = onSettingsClick,
                             viewModel = profileViewModel
                         )
                     }

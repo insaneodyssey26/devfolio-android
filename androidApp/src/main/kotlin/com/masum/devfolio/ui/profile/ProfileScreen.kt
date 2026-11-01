@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.AlternateEmail
 import androidx.compose.material.icons.rounded.AutoAwesome
@@ -30,10 +31,10 @@ import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.Handshake
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.LocationOn
-import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.MilitaryTech
 import androidx.compose.material.icons.rounded.OpenInBrowser
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -52,6 +53,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -72,12 +76,14 @@ import coil3.request.crossfade
 import com.masum.devfolio.data.model.DevfolioUserProfile
 import com.masum.devfolio.data.model.DevfolioUserStats
 import com.masum.devfolio.theme.rememberDevfolioHaptics
+import com.masum.devfolio.ui.auth.DevfolioSignInDialog
 import com.masum.devfolio.ui.components.ExpressiveLoader
 import com.masum.devfolio.util.launchDevfolioCustomTab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    onSettingsClick: () -> Unit,
     viewModel: ProfileViewModel,
     modifier: Modifier = Modifier
 ) {
@@ -85,6 +91,20 @@ fun ProfileScreen(
     val handleInput by viewModel.handleInput.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val haptics = rememberDevfolioHaptics()
+    var showSignInDialog by remember { mutableStateOf(false) }
+
+    if (showSignInDialog) {
+        DevfolioSignInDialog(
+            onDismissRequest = { showSignInDialog = false },
+            onSignInSuccess = {
+                showSignInDialog = false
+                val auth = com.masum.devfolio.data.auth.AuthSessionManager.getInstance(context).currentUser
+                if (auth != null) {
+                    viewModel.onSignedIn(auth.username)
+                }
+            }
+        )
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -108,6 +128,18 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = {
+                            haptics.lightTick()
+                            onSettingsClick()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     if (uiState is ProfileUiState.Success) {
                         IconButton(
                             onClick = {
@@ -116,7 +148,7 @@ fun ProfileScreen(
                             }
                         ) {
                             Icon(
-                                imageVector = Icons.Rounded.Logout,
+                                imageVector = Icons.AutoMirrored.Rounded.Logout,
                                 contentDescription = "Unlink Profile",
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -145,7 +177,7 @@ fun ProfileScreen(
                         },
                         onOpenWebAuth = {
                             haptics.lightTick()
-                            launchDevfolioCustomTab(context, "https://devfolio.co/signin")
+                            showSignInDialog = true
                         }
                     )
                 }

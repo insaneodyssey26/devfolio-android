@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.masum.devfolio.model.Hackathon
 import com.masum.devfolio.theme.rememberDevfolioHaptics
 import com.masum.devfolio.ui.components.FullScreenLoader
+import com.masum.devfolio.ui.components.PredictiveBackContainer
 
 @Composable
 fun HackathonDetailScreen(
@@ -35,8 +36,9 @@ fun HackathonDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val isBookmarked by viewModel.isBookmarked.collectAsState()
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
+    PredictiveBackContainer(onBack = onBackClick) {
+        Scaffold(
+            modifier = modifier.fillMaxSize(),
         bottomBar = {
             if (uiState is DetailUiState.Success) {
                 val hackathon = (uiState as DetailUiState.Success).hackathon
@@ -81,6 +83,7 @@ fun HackathonDetailScreen(
             }
         }
     }
+}
 }
 
 @Composable
@@ -136,7 +139,7 @@ private fun DetailSuccessContent(
         DetailPlatformAttributionSection()
 
         Spacer(modifier = Modifier.height(32.dp))
-    }
+        }
 }
 
 @Composable

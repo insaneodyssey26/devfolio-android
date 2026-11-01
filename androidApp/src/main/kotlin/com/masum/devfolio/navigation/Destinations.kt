@@ -9,4 +9,13 @@ data object DiscoverDestination
 data object ProjectsDestination
 
 @Serializable
+data object SettingsDestination
+
+@Serializable
+data object AboutDestination
+
+@Serializable
 data class DetailDestination(val slug: String)
+
+@Serializable
+data class ProjectDetailDestination(val slug: String)
