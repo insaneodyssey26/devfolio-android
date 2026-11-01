@@ -141,12 +141,12 @@ fun AboutScreen(
                                 }
                                 Column {
                                     Text(
-                                        text = "Devfolio Platform Credits",
+                                        text = "Devfolio Android",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = "Devfolio, NSB Classic PTE LTD",
+                                        text = "Version 0.1.0-alpha · Early Alpha Preview",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
