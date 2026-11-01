@@ -32,8 +32,8 @@ Here are some areas where your help would be very valuable:
 
 ### 2. Fork and Clone
 ```bash
-git clone https://github.com/YOUR_USERNAME/devfolio-app.git
-cd devfolio-app
+git clone https://github.com/YOUR_USERNAME/devfolio-android.git
+cd devfolio-android
 ```
 
 ### 3. Build & Verify Locally

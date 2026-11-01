@@ -19,7 +19,7 @@ If you believe you have found a security vulnerability in Devfolio Android, plea
 
 ### How to Report
 - **Do not open a public GitHub issue** for sensitive security vulnerabilities or credential leakage risks.
-- Please use [GitHub Private Vulnerability Reporting](https://github.com/insaneodyssey26/devfolio-app/security/advisories/new) on this repository to submit details privately.
+- Please use [GitHub Private Vulnerability Reporting](https://github.com/insaneodyssey26/devfolio-android/security/advisories/new) on this repository to submit details privately.
 - Alternatively, you can reach out directly to the maintainer via email or direct message.
 
 ### What to Include in Your Report

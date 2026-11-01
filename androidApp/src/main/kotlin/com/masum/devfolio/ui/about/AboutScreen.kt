@@ -60,7 +60,7 @@ fun AboutScreen(
 ) {
     val context = LocalContext.current
     val haptics = rememberDevfolioHaptics()
-    val repoUrl = "https://github.com/insaneodyssey26/devfolio-app"
+    val repoUrl = "https://github.com/insaneodyssey26/devfolio-android"
     val devfolioUrl = "https://devfolio.co"
 
     PredictiveBackContainer(onBack = onBackClick) {

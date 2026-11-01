@@ -2,6 +2,12 @@
 
 An open source Android client for Devfolio built with Kotlin Multiplatform and native Jetpack Compose.
 
+<p align="left">
+  <a href="https://github.com/insaneodyssey26/devfolio-android/releases">
+    <img alt="Get it on GitHub" height="70" src="docs/badges/github.svg" />
+  </a>
+</p>
+
 > [!WARNING]
 > **Early Alpha Version (v0.1.0-alpha)**  
 > This is a very early, experimental community preview. You should expect bugs, incomplete features, and ongoing API iterations. We are actively polishing the UX and architecture. Contributions, bug reports, and feature requests are very welcome!
