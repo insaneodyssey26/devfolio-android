@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeCompiler)
 }
 
@@ -13,6 +14,7 @@ kotlin {
 
 dependencies {
     implementation(project(":shared"))
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.compose)

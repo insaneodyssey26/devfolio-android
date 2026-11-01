@@ -8,7 +8,7 @@ interface DevfolioApiService {
         type: String = "application_open",
         query: String? = null,
         from: Int = 0,
-        size: Int = 20
+        size: Int = 50
     ): Result<List<Hackathon>>
 
     suspend fun getHackathonDetail(slug: String): Result<Hackathon>
@@ -16,6 +16,6 @@ interface DevfolioApiService {
     suspend fun searchProjects(
         query: String? = null,
         from: Int = 0,
-        size: Int = 20
+        size: Int = 50
     ): Result<List<Project>>
 }

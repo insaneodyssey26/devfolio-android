@@ -29,10 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.masum.devfolio.model.HackathonFaq
 import com.masum.devfolio.theme.SquircleBadgeShape
+import com.masum.devfolio.theme.rememberDevfolioHaptics
+import com.masum.devfolio.ui.components.BookmarkButton
+import com.masum.devfolio.util.launchDevfolioCustomTab
 
 @Composable
 fun DetailHeroBanner(
@@ -79,7 +84,7 @@ fun DetailHeroBanner(
                 )
             }
 
-            com.masum.devfolio.ui.components.BookmarkButton(
+            BookmarkButton(
                 isBookmarked = isBookmarked,
                 onToggle = onBookmarkToggle
             )
@@ -285,6 +290,37 @@ fun DetailDescriptionSection(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun DetailPlatformAttributionSection(
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val haptics = rememberDevfolioHaptics()
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+        )
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = "PLATFORM ATTRIBUTION",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = "All hackathon listings, timelines, and application submissions are securely managed and hosted by Devfolio (NSB Classic PTE LTD).",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

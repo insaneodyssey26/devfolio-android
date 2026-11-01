@@ -133,6 +133,8 @@ private fun DetailSuccessContent(
             faqs = hackathon.faqs
         )
 
+        DetailPlatformAttributionSection()
+
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
